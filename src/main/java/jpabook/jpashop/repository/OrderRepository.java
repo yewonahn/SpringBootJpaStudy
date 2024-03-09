@@ -5,7 +5,6 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import jpabook.jpashop.domain.Member;
 import jpabook.jpashop.domain.Order;
-import jpabook.jpashop.domain.OrderSearch;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
@@ -28,7 +27,7 @@ public class OrderRepository {
     }
 
     // 검색 기능
-     public List<Order> findAll(OrderSearch orderSearch) {
+     public List<Order> findAllByString(OrderSearch orderSearch) {
 
         /*
         [동적 쿼리 적용하기 전 jpql]
@@ -44,7 +43,7 @@ public class OrderRepository {
          */
 
          // 동적쿼리로 만들기
-         // [방법1] language  = JPAQL
+         // [방법1] language  = JPQL
          // 결론 : 매우 복잡. 알 필요없음
          String jpql = "select o from Order o join o.member m";
          boolean isFirstCondition = true;
@@ -80,8 +79,9 @@ public class OrderRepository {
              query = query.setParameter("status", orderSearch.getOrderStatus());
          }
          if (StringUtils.hasText(orderSearch.getMemberName())) {
+             query = query.setParameter("name", orderSearch.getMemberName());
          }
-         query = query.setParameter("name", orderSearch.getMemberName());
+
          return query.getResultList();
 
          // JPQL 을 문자로 생성하는건 굉장히 복잡하고 번거롭다. 실수로 인한 버그 발생 가능성도 있음

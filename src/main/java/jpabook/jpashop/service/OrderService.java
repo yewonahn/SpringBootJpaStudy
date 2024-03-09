@@ -5,6 +5,7 @@ import jpabook.jpashop.domain.item.Item;
 import jpabook.jpashop.repository.ItemRepository;
 import jpabook.jpashop.repository.MemberRepository;
 import jpabook.jpashop.repository.OrderRepository;
+import jpabook.jpashop.repository.OrderSearch;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,27 +24,28 @@ public class OrderService {
     // 주문
     public Long order(Long memberId, Long itemId, int count) {
 
+        // 식별자만 넘겨받고,
+        // 핵심 비즈니스 로직 서비스에서, entity 를 찾는 것 부터 직접
+        // 트랜잭션 안에서 entity 조회해야 영속성 컨텍스트로 진행됨 (status 바꾸기 가능 등등..)
+
         // 엔티티 조회
-        jpabook.jpashop.domain.Member member = memberRepository.findOne(memberId);
+        Member member = memberRepository.findOne(memberId);
         Item item = itemRepository.findOne(itemId);
 
         // 배송 정보 생성
-        jpabook.jpashop.domain.Delivery delivery = new jpabook.jpashop.domain.Delivery();
+        Delivery delivery = new Delivery();
         delivery.setAddress(member.getAddress());
-<<<<<<< HEAD
+
         delivery.setStatus(DeliveryStatus.READY);
-=======
-        delivery.setStatus(jpabook.jpashop.domain.DeliveryStatus.READY);
->>>>>>> 2d4578baa795bda320b3f6df0c22573df2a32d39
 
         // 주문 상품 생성
-        jpabook.jpashop.domain.OrderItem orderItem = jpabook.jpashop.domain.OrderItem.createOrderItem(item, item.getPrice(), count);
+        OrderItem orderItem = OrderItem.createOrderItem(item, item.getPrice(), count);
         // 이 방식 외의 다른 방식으로의 생성 (new OrderItem()) 을 막아야 함
         // -> orderItem 에 로직 추가 -> 근데 이것도 롬복 사용으로 줄이기 가능
         // @NoArgsConstructor(access = AccessLevel.PROTECTED) 사용
 
         // 주문 생성
-        jpabook.jpashop.domain.Order order = jpabook.jpashop.domain.Order.createOrder(member, delivery, orderItem);
+        Order order = Order.createOrder(member, delivery, orderItem);
         // 주문 상품 생성과 마찬가지 이유로
         // @NoArgsConstructor(access = AccessLevel.PROTECTED) 사용
 
@@ -60,7 +62,7 @@ public class OrderService {
     @Transactional
     public void cancelOrder(Long orderId) {
         // 주문 엔티티 조회
-        jpabook.jpashop.domain.Order order = orderRepository.findOne(orderId);
+        Order order = orderRepository.findOne(orderId);
         // 주문 취소
         order.cancel();
 
@@ -76,9 +78,7 @@ public class OrderService {
     }
 
     // 검색
-    /*
     public List<Order> findOrders(OrderSearch orderSearch) {
-        return orderRepository.findAll(orderSearch);
+        return orderRepository.findAllByString(orderSearch);
     }
-     */
 }

@@ -24,6 +24,7 @@ public class ItemRepository {
             // 따라서 여기에서의 save 는 update 와 유사
             // (merge 는 update 와 유사함)
             em.merge(item);
+            // Item merge = em.merge(item);
         }
     }
 

@@ -80,6 +80,12 @@ public class Order {
         for (OrderItem orderItem : orderItems) {
             orderItem.cancel();
         }
+
+        // (준영속 엔티티 설명 관련)
+        // 여기 취소 로직에서 entityManager.update, entityManager.merge 이런거 없음
+        // OrderStatus.CANCEL 이거로 상태 바꿔두기만 하면,
+        // JPA 가 트랜잭션 커밋 시점에 바뀐거 찾아서, db 에 update 문 날리고 트랜잭션 커밋함
+        // -> flush 할 때 dirty checking 이 일어남
     }
 
     // == 조회 로직 ==
